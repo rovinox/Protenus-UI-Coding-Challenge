@@ -1,48 +1,121 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import CardInfo from "./CardInfo"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1 className="App-title">Welcome to the Protenus UI Coding Challenge!</h1>
-      </header>
-      <section className="App-instructions">
-        <h2>Introduction</h2>
-        <p>Congratulations on making it this far!</p>
-        <p>
-          The purpose of this challenge is for us to understand how you code and to see how you
-          tackle a problem. We are not expecting a "right" or a "perfect" solution - so let loose
-          and do what you do best.
-        </p>
-        <h2>Problem</h2>
-        <p>
-          For this challenge, you are tasked with creating a Netflix-style movie queue. The hard
-          requirements are simply 1) <strong>present a list of movies in a catalog</strong> and
-          2) <strong>allow the user to manage their personal queue by adding, removing, and
-          re-ordering the movies.</strong> Beyond that you are free to add to the application as
-          you see fit. This may come in the form of styling, graphics, a lightweight back-end,
-          unit-tests, etc.
-        </p>
-        <h2>Technologies</h2>
-        <p>
-          As our products are built in React, we would prefer the solution to this challenge would
-          follow suit. However, if you are unfamiliar with React but an absolute ninja in Angular
-          for example, we are able to work with that. Otherwise, you are encouraged to add any
-          dependencies/technologies to make this task easier.
-        </p>
-        <h2>Logistics</h2>
-        <p>
-          If at any time you have a question about this task, feel free to reach out to one of
-          the development team members. When you have finished we would like you to <strong>
-          submit your code by way of Dropbox, Google Drive, etc. (<em>not</em> a Git branch/fork).
-          </strong>
-        </p>
-      </section>
-    </div>
-  );
+// fake data generator
+const getItems = count =>
+  Array.from({ length: count }, (v, k) => k).map(k => ({
+    id: `item-${k}`,
+    content: `item ${k}`
+  }));
+
+// a little function to help us with reordering the result
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const grid = 8;
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+  // some basic styles to make the items look a bit nicer
+  userSelect: "none",
+  padding: grid * 2,
+  margin: `0 0 ${grid}px 0`,
+  
+
+  // change background colour if dragging
+  background: isDragging ? "lightgreen" : "grey",
+
+  // styles we need to apply on draggables
+  ...draggableStyle
+});
+
+const getListStyle = isDraggingOver => ({
+  background: isDraggingOver ? "lightblue" : "lightgrey",
+  padding: grid,
+  width:"345px"
+});
+
+
+class App extends Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: [
+        {id:1, content:"hola1",
+        image:"https://cdn.pixabay.com/photo/2014/03/29/09/17/cat-300572__340.jpg"
+      },
+        {id:2, content:"hola2"},
+        {id:3, content:"hola3"},
+        {id:4, content:"hola4"},
+    ]
+    };
+    this.onDragEnd = this.onDragEnd.bind(this);
+  }
+
+  onDragEnd(result) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const items = reorder(
+      this.state.items,
+      result.source.index,
+      result.destination.index
+    );
+
+    this.setState({
+      items
+    });
+  }
+  
+  // Normally you would want to split things out into separate components.
+  // But in this example everything is just done in one place for simplicity
+  render() {
+    return (
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        <Droppable droppableId="droppable">
+          {(provided, snapshot) => (
+            <div 
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              style={getListStyle(snapshot.isDraggingOver)}
+            >
+              {this.state.items.map((item, index) => (
+                <Draggable key={item.id} draggableId={item.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div 
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={getItemStyle(
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      )}
+                    >
+                      <div style={{textAlign:"center"}}>
+                        <CardInfo image={item.image} content={item.content}/>
+                      
+                      </div>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              
+            </div>
+          )}
+        </Droppable>
+       
+      </DragDropContext>
+    );
+  }
 }
 
-export default App;
+export default App
