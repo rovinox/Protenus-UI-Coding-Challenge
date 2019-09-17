@@ -4,19 +4,22 @@ import Movies from "./components/Movies"
 import MyList from "./components/MyList"
 import axios from "axios"
 
+
+
 export default class App extends Component {
    constructor(props){
      super(props)
      this.state ={
        movies:[],
        myList:[],
-       page:"movies"
+       page:"movies",
+       
      }
    }
 
    componentDidMount(){
      axios.get("/movie/api").then(Response =>{
-       console.log(Response);
+       
        this.setState({
          movies: Response.data
        })
@@ -40,16 +43,21 @@ export default class App extends Component {
 
    myList:[...this.state.myList, movie]})
   }
-    
+ 
+  RsetList = (item) =>{
+      this.setState({
+        myList:item
+      })
+  }
 
   render() {
-    console.log(this.state.myList);
+   
     return (
       <div>
         <Header listTab={this.listTab} movieTab={this.movieTab}  />
         {this.state.page === "movies" ? 
-          <Movies movies={this.state.movies} addToList={this.addToList} /> : 
-          <MyList myList={this.state.myList} />}
+        <Movies movies={this.state.movies} addToList={this.addToList} /> : 
+        <MyList myList={this.state.myList} RsetList={() => {this.RsetList()}}  />}
       </div>
     )
   }

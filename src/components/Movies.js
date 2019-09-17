@@ -8,6 +8,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
+
 const useStyles = makeStyles({
   card: {
     maxWidth: 345,
@@ -15,14 +16,21 @@ const useStyles = makeStyles({
   },
 });
 
-
+function searching(term) {
+    return function (x) {
+      return x.title.toLowerCase().includes(term.toLowerCase()) 
+      
+    }
+    
+  }
 
 
 export default function Movies(props) {
+  const [term, setTerm] = React.useState("");  
   const classes = useStyles();
- const displayMovies = props.movies.map(movie =>{
+  const displayMovies = props.movies.filter(searching(term)).map(movie =>{
      return (
-        <Card className={classes.card}>
+        <Card  key={movie.movie_id} className={classes.card}>
       <CardActionArea>
         <CardMedia
           component="img"
@@ -57,6 +65,8 @@ export default function Movies(props) {
         fullWidth
         margin="normal"
         variant="filled"
+        value={term}
+        onChange={(e) =>{setTerm(e.target.value)}}
         InputLabelProps={{
           shrink: true,
         }}
