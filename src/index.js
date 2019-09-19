@@ -6,6 +6,7 @@ import * as serviceWorker from './serviceWorker';
 import teal from "@material-ui/core/colors/teal";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
+import 'react-toastify/dist/ReactToastify.min.css';
 
 
 const theme = createMuiTheme({

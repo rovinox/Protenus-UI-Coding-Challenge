@@ -3,17 +3,25 @@ import Card from "@material-ui/core/Card"
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import CardActions from '@material-ui/core/CardActions';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-
+import {ToastContainer} from 'react-toastify';
 const useStyles = {
     card: {
       maxWidth: 345,
       margin:"10px"
     },
+   noMovie: {
+    textAlign:"center",
+     marginTop:"400px, auto"
+
+
+    }
   };
 
   
-// a little function to help us with reordering the result
+
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
@@ -38,7 +46,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 });
 
 const getListStyle = isDraggingOver => ({
-  background: isDraggingOver ? 'lightblue' : 'lightgrey',
+  background: isDraggingOver ? 'none' : 'none',
   display: 'flex',
   padding: grid,
   overflow: 'auto',
@@ -62,7 +70,7 @@ class MyList extends Component {
     }
 
     const items = reorder(
-      this.props.myList,
+      this.state.items,
       result.source.index,
       result.destination.index
     );
@@ -72,6 +80,14 @@ class MyList extends Component {
     });
   }
 
+  removeFromList = (index) =>{
+    let newList = this.state.items.slice();
+    newList.splice(index, 1);
+    this.setState({
+      items: newList
+    });
+  }
+  
  
   render() {
       
@@ -79,15 +95,17 @@ class MyList extends Component {
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable" direction="horizontal">
           {(provided, snapshot) => (
-            <div
+            <div 
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
               {...provided.droppableProps}
             >
-              {this.props.myList.map((item, index) => (
+              {!this.state.items[0] ? 
+              <Typography variant="h3"> You Have No Movies On Your List </Typography> : 
+              this.state.items.map((item, index) => (
                 <Draggable key={item.index} draggableId={item.movie_id} index={index}>
                   {(provided, snapshot) => (
-                    <div
+                    <div 
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -104,12 +122,18 @@ class MyList extends Component {
                             <CardMedia
                                 component="img"
                                 alt="Contemplative Reptile"
-                                height="450"
+                                height="400"
                                 width="200"
                                 image={item.image}
                                 title="Contemplative Reptile"
                                 />
                             </CardContent>
+                            <CardActions>
+                               <Button onClick={()=>{this.removeFromList(index)}} size="small" color="primary">
+                                remove
+                               </Button>
+                               <ToastContainer/>
+                            </CardActions>
                         </Card>
                       
                     </div>

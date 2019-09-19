@@ -3,6 +3,8 @@ import Header from "./components/Header"
 import Movies from "./components/Movies"
 import MyList from "./components/MyList"
 import axios from "axios"
+import { toast, ToastContainer} from 'react-toastify';
+
 
 
 
@@ -30,8 +32,9 @@ export default class App extends Component {
     this.setState({
       page: "list"
     })
+    toast.info("You Can Drag The movies Around")
+}
 
-  }
   movieTab =() =>{
     this.setState({
       page:"movies"
@@ -42,13 +45,10 @@ export default class App extends Component {
     this.setState({
 
    myList:[...this.state.myList, movie]})
+   console.log(movie);
   }
  
-  RsetList = (item) =>{
-      this.setState({
-        myList:item
-      })
-  }
+ 
 
   render() {
    
@@ -57,7 +57,7 @@ export default class App extends Component {
         <Header listTab={this.listTab} movieTab={this.movieTab}  />
         {this.state.page === "movies" ? 
         <Movies movies={this.state.movies} addToList={this.addToList} /> : 
-        <MyList myList={this.state.myList} RsetList={() => {this.RsetList()}}  />}
+        <MyList myList={this.state.myList} />}
       </div>
     )
   }
